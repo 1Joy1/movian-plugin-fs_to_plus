@@ -1,0 +1,15 @@
+{
+	"description": "<p>FS.UA - Смотреть  онлайн в хорошем качестве и скачать кино бесплатно на FS.ua<p>Для дополнительной информации, посетите <a href=\"http://fs.ua\">http://fs.ua</a>",
+	"author": "lprot", 
+	"homepage": "http://github.com/lprot/showtime-plugins",
+	"title": "FS.UA",
+	"synopsis": "FS.UA: Рекомендательная медиа сеть",
+	"version": "1.2.10",
+        "file": "fs_to.js",
+	"showtimeVersion": "4.8",
+	"type": "ecmascript",
+	"id": "fs.to",
+	"icon": "logo.jpg",
+	"category": "video",
+        "regions": ["UA", "RU"]
+}
