@@ -2,6 +2,7 @@
  * fs.ua plugin for Movian Media Center
  *
  *  Copyright (C) 2015 lprot
+ *  Copyright (C) 2016 Marshak Igor (!Joy!)
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
