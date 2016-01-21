@@ -1,15 +1,15 @@
 {
 	"description": "<p>FS.UA - Смотреть  онлайн в хорошем качестве и скачать кино бесплатно на FS.ua<p>Для дополнительной информации, посетите <a href=\"http://fs.ua\">http://fs.ua</a>",
 	"author": "lprot (modification by !Joy!)", 
-	"homepage": "https://github.com/1Joy1/movian-plugin-fs_to_plus/fs_to_plus",
+	"homepage": "https://github.com/1Joy1/movian-plugin-fs_to_plus/",
 	"title": "FS.UA plus",
 	"synopsis": "FS.UA: Рекомендательная медиа сеть",
 	"version": "0.0.5",
-    "file": "fs_to.js",
+	"file": "fs_to.js",
 	"showtimeVersion": "4.8",
 	"type": "ecmascript",
 	"id": "FS.TO plus",
 	"icon": "logo.png",
 	"category": "video",
-        "regions": ["UA", "RU"]
+	"regions": ["UA", "RU"]
 }
