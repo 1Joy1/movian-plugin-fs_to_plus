@@ -1,0 +1,10 @@
+
+PLUGINS= \
+        fs_to_plus.zip\
+
+%.zip:
+	@echo "Bundle plugin '$*'"
+	@del .\plugins\$*.zip
+	@cd $* & WinRAR a -afzip -m5 ..\plugins\$* & cd ..
+
+all: ${PLUGINS}
