@@ -32,20 +32,20 @@
     });
 
 	////////////////////////////////////////////Login of site & Exit of site///////////////////////////////////////
-	
-	settings.createDivider('Авторизация на FS.TO');	
+
+	settings.createDivider('Авторизация на FS.TO');
 	var store = plugin.createStore('authinfo', true);
-	
+
 	// Залогинится
-	settings.createAction('createAuth', 'Войти на сайт', function login(){	
-		var credentials = plugin.getAuthCredentials(plugin.getDescriptor().synopsis, 
-		                                            'Пожалуйста введите свой логин и пароль от сайта', true);    
-		
+	settings.createAction('createAuth', 'Войти на сайт', function login(){
+		var credentials = plugin.getAuthCredentials(plugin.getDescriptor().synopsis,
+		                                            'Пожалуйста введите свой логин и пароль от сайта', true);
+
 		if (credentials.rejected) {
             showtime.notify('Для завершения авторизации вы должны ввести логин и пароль вашего аккаунта', 5, '');
             return;
         }
-	    if (credentials.username && credentials.password) {			
+	    if (credentials.username && credentials.password) {
 	        var doc = showtime.httpReq(service.baseUrl.toString() + "/login.aspx", {
 			    headers: {"Accept": "application/json, text/javascript, */*; q=0.01",
                           "Accept-Language": "ru,en-US;q=0.7,en;q=0.3",
@@ -61,7 +61,7 @@
 			    debug: true,
 				noFollow: true
             });
-			  
+
 			showtime.notify("Отсылаем запрос на авторизацию", 5, '');
 			//if (doc.statuscode == 200){ //Available only from 4.99.211 version
 			    if (doc.toString().match(/"state":"auth_success"/) || doc.toString().match(/isLogged : true/)) {
@@ -71,19 +71,19 @@
 					        showtime.notify("Авторизация не удачна, логин или пароль введены неверно.", 5, '');
 							login();
 						} else showtime.notify("Что то здесь не так нужно разобраться", 5, '');
-			//} else {showtime.notify("Запрос на авторизацию не удачен, статус=" + doc.statuscode , 5, '');}			
+			//} else {showtime.notify("Запрос на авторизацию не удачен, статус=" + doc.statuscode , 5, '');}
         } else {
 	        showtime.notify('Для завершения авторизации вы должны ввести логин и пароль вашего аккаунта', 5, '');
-            login();				
+            login();
 		}
 	});
-	
+
 	// Разлогинится
 	settings.createAction('clearAuth', 'Выйти с сайта', function() {
 	    var confirm = showtime.message("Вы уверены, что хотите разлогинится на сайте", true, true);
 	    if (confirm){
 	        store.access_data = {};
-	   		var doc = showtime.httpReq(service.baseUrl.toString() + "/logout.aspx", { 
+	   		var doc = showtime.httpReq(service.baseUrl.toString() + "/logout.aspx", {
 	    	    headers: {"Accept": "application/json, text/javascript, */*; q=0.01",
                           "Accept-Language": "ru,en-US;q=0.7,en;q=0.3",
                           "Accept-Encoding": "gzip, deflate",
@@ -101,7 +101,7 @@
             showtime.notify('Movian разлогинен на FS.TO', 3, '');
 		}
     });
- 
+
  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     function setPageHeader(page, title) {
@@ -217,19 +217,20 @@
 
 		// Scrape iframe obj
 	    var iframe_url = response.match(/<iframe src="([\S\s]*?)"/);
-		if (iframe_url && iframe_url[1] != "about: blank") { 
+		if (iframe_url && iframe_url[1] != "about: blank") {
 		    iframe_url = iframe_url[1];
-		    var iframe_obj_response = showtime.httpReq(service.baseUrl + iframe_url, { 
+		    var iframe_obj_response = showtime.httpReq(service.baseUrl + iframe_url, {
 	    	    headers: {
                           "X-Requested-With": "XMLHttpRequest",
                          }
 			});
 			if (iframe_obj_response) var obj_resp = showtime.JSONDecode(iframe_obj_response);
 		}
-		
+
         // Scrape icon
 	    var icon = response.match(/<link rel="image_src" href="([^"]+)"/);
-	    if (icon) icon = "http:" + icon[1];
+	    //if (icon) icon = "http:" + icon[1];
+        if (icon) icon = icon[1];
 
         // Scrape description
 	    var description = response.match(/<p class="item-decription [^"]+">([\S\s]*?)<\/p>/);
@@ -239,9 +240,9 @@
         var duration = response.match(/itemprop="duration"[\S\s]*?>([\S\s]*?)<\/span>/);
         if (duration) duration = duration[1].trim().substr(0, 8);
 
-        // Scrape item info		
+        // Scrape item info
         var iteminfo = response.match(/<div class="item-info">([\S\s]*?)<\/div>/);
-		
+
         if (iteminfo) {  //(This  old design)
            iteminfo = iteminfo.toString();
            // Scrape years
@@ -273,26 +274,26 @@
            htmlBlock = iteminfo.match(/Статус:[\S\s]*?<\/td>[\S\s]*?>([\S\s]*?)<\/td>/);
            if (htmlBlock)
               description = coloredStr("Статус: ", orange) + trim(htmlBlock[1]) + " " + description;
-        
+
 		} else if (obj_resp) { //(This new design)
 		    // Scrape years
             if (obj_resp.coverData.year){
 			    var year = obj_resp.coverData.year[0].title;
 			} else if (obj_resp.coverData.view_period){ // handle as serials
 			    year = obj_resp.coverData.view_period.show_start.title
-			};			
+			};
 			// Scrape genres
 			if (obj_resp.coverData.genre && obj_resp.coverData.genre.length > 0) {
 			    var genres = "";
 			    for (var i = 0; i < obj_resp.coverData.genre.length; i++){
-				    if (i === 0) genres = obj_resp.coverData.genre[i].title; 
+				    if (i === 0) genres = obj_resp.coverData.genre[i].title;
 					else genres = genres + ", " + obj_resp.coverData.genre[i].title;
 				}
-			} 
+			}
 			// Try to get status
 			if (obj_resp.coverData.status) description = coloredStr("Статус: ", orange) + trim(obj_resp.coverData.status) + " " + description;
-        }	
-		
+        }
+
         // Scrape votes
         htmlBlock = response.match(/<div class="b-tab-item__vote-value m-tab-item__vote-value_type_yes">([\S\s]*?)<\/div>[\S\s]*?<div class="b-tab-item__vote-value m-tab-item__vote-value_type_no">([\S\s]*?)<\/div>/);
         if (htmlBlock) {
@@ -307,7 +308,7 @@
         } else if (obj_resp){ //new design data of "iframe"
 			if (obj_resp.coverData.title_origin){
 			    title += ' | ' + obj_resp.coverData.title_origin;
-			}	
+			}
 		}
 
         playOnlineUrl = url;
@@ -331,7 +332,7 @@
 
         // Scrape screenshots
 		///////////////////////////if new player on page... page include "iframe"///////////////////////////////
-		if (obj_resp){	
+		if (obj_resp){
 			if (obj_resp.coverData.screens && obj_resp.coverData.screens.length > 0){
 			    var screen_str = "";
 			    for (var i = 0; i < obj_resp.coverData.screens.length; i++){
@@ -339,9 +340,9 @@
 				}
                 page.appendItem(plugin.getDescriptor().id + ':screens:' + escape(screen_str)+':'+escape(title), "directory", {
                     title: 'Скриншоты'
-				});			    
+				});
 			}
-		 ///////////////////////////////////if old player on page/////////////////////////////////////////	
+		 ///////////////////////////////////if old player on page/////////////////////////////////////////
 		} else {
 		    htmlBlock = response.match(/<div class="items">([\S\s]*?)<\/div>/);
             if (htmlBlock) {
@@ -351,7 +352,7 @@
                     });
                 }
             }
-	    } 
+	    }
 		// Scrape screenshots
 
         var what_else = response.match(/<div class="b-posters">([\S\s]*?)<div class="clear">/);
@@ -484,8 +485,8 @@
                     page.appendItem(plugin.getDescriptor().id + ":index:" + escape(service.baseUrl + obj_resp.coverData.view_period.show_start.link) + ":" + escape(obj_resp.coverData.view_period.show_start.title) + ':no:&sort=rating', "directory", {
                         title: obj_resp.coverData.view_period.show_start.title
                     });
-            }       
-		
+            }
+
 		    // Scrape genres
             if (obj_resp.coverData.genre && obj_resp.coverData.genre.length > 0) {
                 page.appendItem("", "separator", {
@@ -495,9 +496,9 @@
                     page.appendItem(plugin.getDescriptor().id + ":index:" + escape(service.baseUrl + obj_resp.coverData.genre[i].link) + ":" + escape('Отбор по жанру: '+ obj_resp.coverData.genre[i].title) + ':no:&sort=year', "directory", {
                         title: obj_resp.coverData.genre[i].title
                     });
-				}	
+				}
             }; // Scrape genres
-			
+
 			// Scrape countries
             if (obj_resp.coverData.made_in && obj_resp.coverData.made_in.length > 0) {
                 page.appendItem("", "separator", {
@@ -507,9 +508,9 @@
                     page.appendItem(plugin.getDescriptor().id + ":index:" + escape(service.baseUrl + obj_resp.coverData.made_in[i].link) + ":" + escape('Отбор по стране: '+ obj_resp.coverData.made_in[i].title) + ':no:&sort=year', "directory", {
                         title: obj_resp.coverData.made_in[i].title
                     });
-				}	
+				}
             }; // Scrape countries
-			
+
 	        // Show directors
 			if (obj_resp.coverData.director && obj_resp.coverData.director.length > 0) {
                 page.appendItem("", "separator", {
@@ -519,9 +520,9 @@
                     page.appendItem(plugin.getDescriptor().id + ":index:" + escape(service.baseUrl + obj_resp.coverData.director[i].link) + ":" + escape('Отбор по режисерам: '+ obj_resp.coverData.director[i].title) + ':no:&sort=year', "directory", {
                         title: obj_resp.coverData.director[i].title
                     });
-				}	
+				}
             };// Show directors
-			
+
 	        // Show actors
 			if (obj_resp.coverData.cast && obj_resp.coverData.cast.length > 0) {
                 page.appendItem("", "separator", {
@@ -531,9 +532,9 @@
                     page.appendItem(plugin.getDescriptor().id + ":index:" + escape(service.baseUrl + obj_resp.coverData.cast[i].link) + ":" + escape('Отбор по актёрам: '+ obj_resp.coverData.cast[i].title) + ':no:&sort=year', "directory", {
                         title: obj_resp.coverData.cast[i].title
                     });
-				}	
+				}
             };// Show actors
-		};	
+		};
 
         // Show related
         if (what_else) {
@@ -621,10 +622,13 @@
 
     function processAjax(page, url, folder, title, quality) {
         page.loading = true;
+
         //showtime.print(service.baseUrl + unescape(url) + '?ajax&blocked=0&folder=' + folder);
+
         var response = showtime.httpReq(service.baseUrl + unescape(url) + '?ajax&blocked=0&folder=' + folder).toString();
         response = response.substr(response.indexOf('class="filelist'), response.lastIndexOf('</ul>'));
         response = response.replace(/<ul class="filelist([\s\S]*?)<\/ul>/g, '');
+
         // 1-type(folder/file), 2-body
         var re = /<li class="([^"]+)([\S\s]*?)(<\/li>|"  >)/g;
         var m = re.exec(response);
@@ -666,7 +670,7 @@
                         var mark = n[1].replace(' m-', '');
                         var qualities = getQualities(n[5]);
                         for (var i in qualities) {
-                            page.appendItem(plugin.getDescriptor().id + ":listFolder:" + escape(url) + ":" + getId(n[3]) + ":" + escape(unescape(title)) + ':' + qualities[i].filter, "directory", {
+                            page.appendItem(plugin.getDescriptor().id + ":listFolder:" + escape(url) + ":" + escape(getId(n[3])) + ":" + escape(unescape(title)) + ':' + qualities[i].filter, "directory", {
                                 title: new showtime.RichText((mark ? coloredStr(mark, orange) + ' ' : '') +
                                     coloredStr(n[2].replace('simple ', '').replace('subtype ', '').replace('m-', ''), orange) +
                                     trim(n[4]) + ' ' +
@@ -680,7 +684,7 @@
                         // 1-lang/type, 2-folderID, 3-title, 4-details, 5-size, 6-date
                         n = m[2].replace('<span class="material-size"></span>', '').match(/link-([\S\s]*?)title" rel="\{parent_id: (.*)\}"[\S\s]*?>([\S\s]*?)<\/a>[\S\s]*?<span class="material-[\S\s]*?">([\S\s]*?)<\/span>[\S\s]*?<span class="material-details">([^\<]+)[\S\s]*?<span class="material-date">([^\<]+)<\/span>/);
                         var lang = n[1].replace('simple ', '').replace('subtype ', '').replace('m-', '');
-                        page.appendItem(plugin.getDescriptor().id + ":listFolder:" + escape(url) + ":" + getId(n[2]) + ":" + escape(unescape(title)) + ':0', "directory", {
+                        page.appendItem(plugin.getDescriptor().id + ":listFolder:" + escape(url) + ":" + escape(getId(n[2])) + ":" + escape(unescape(title)) + ':0', "directory", {
                             title: new showtime.RichText((lang ? coloredStr(lang, orange) + ' ' : '') +
                                 trim(n[3]) + ' ' +
                                 colorStr(n[4], orange) + ' ' +
@@ -752,40 +756,55 @@
 
 	// Processes "Play online" button
     var playOnlineUrl;
-    plugin.addURI(plugin.getDescriptor().id + ":playOnline:(.*)", function(page, title) {    	
+    plugin.addURI(plugin.getDescriptor().id + ":playOnline:(.*)", function(page, title) {
         page.loading = true;
         var response = showtime.httpReq(service.baseUrl + playOnlineUrl).toString();
         page.loading = false;
-		
+
 		var iframe_url = response.match(/<iframe src="([\S\s]*?)"/);
+
 		if (iframe_url && iframe_url[1] != "about: blank") {
 		    iframe_url = iframe_url[1];
-		    var iframe_obj_response = showtime.httpReq(service.baseUrl + iframe_url, { 
+		    var iframe_obj_response = showtime.httpReq(service.baseUrl + iframe_url, {
 	    	    headers: {
                           "X-Requested-With": "XMLHttpRequest",
                          }
 			});
 			if (iframe_obj_response) var obj_resp = showtime.JSONDecode(iframe_obj_response);
-			
-			
+
+
 		    if (obj_resp.actionsData.rootQualityFlag == 'hd'){
 			    var link = obj_resp.actionsData.files[0].url.replace(".mp4", "_hd.mp4");
 			} else link = obj_resp.actionsData.files[0].url;
 
-			page.type = "video";
-            page.source = "videoparams:" + showtime.JSONEncode({
-                title: unescape(title),
-                imdbid: getIMDBid(title),
-                canonicalUrl: plugin.getDescriptor().id + ":playOnline:" + title,
-                sources: [{
-			        url: service.baseUrl + link
-                }]
-            });
 		} else {
+
             var url = response.match(/playlist: \[[\S\s]*?url: '([^']+)/) // Some clips autoplay
+
             if (!url) {
                 page.loading = true;
-                response = showtime.httpReq(service.baseUrl + response.match(/<div id="page-item-viewonline"[\S\s]*?<a href="([^"]+)/)[1]).toString();
+
+                var view_online_batton_url = service.baseUrl + response.match(/<div id="page-item-viewonline"[\S\s]*?<a href="([^"]+)/)[1];
+                var link_id = view_online_batton_url.match(/\/i(?:[a-zA-Z0-9]{4}\.)?([0-9a-zA-Z]+)/i)[1];
+                var frame_hash_JSON_link = service.baseUrl + "/jsitem/i" + link_id + "/status.js?hr=" + escape(service.baseUrl + playOnlineUrl) + "&rf=";
+
+
+                var frame_hash_JSON = showtime.httpReq(frame_hash_JSON_link).toString();
+                var frame_hash = frame_hash_JSON.match(/frame_hash\': \'([\S\s]*?)\'/)[1];
+
+                var response = showtime.httpReq(
+                        view_online_batton_url.replace('view', 'view_iframe') + "?frame_hash=" + frame_hash, {
+                            headers: {
+                                      "X-Requested-With": "XMLHttpRequest",
+                                     }
+                        }).toString();
+
+                page.loading = false;
+
+                var link = showtime.JSONDecode(response).actionsData.files[0].url;
+
+               /* showtime.print("response-1");
+                //showtime.print(response);
                 page.loading = false;
                 response = response.match(/<a id="[\S\s]*?" href="([\S\s]*?)" title="([\S\s]*?)"/);
                 if (!response) {
@@ -794,20 +813,23 @@
                 }
                 page.loading = true;
                 url = showtime.httpReq(service.baseUrl + response[1]).toString().match(/playlist: \[[\S\s]*?url: '([^']+)/);
-                page.loading = false;
+                page.loading = false;*/
+            } else {
+                var link = url[1];
             }
-            page.type = "video";
-            page.source = "videoparams:" + showtime.JSONEncode({
-                title: unescape(title),
-                imdbid: getIMDBid(title),
-                canonicalUrl: plugin.getDescriptor().id + ":playOnline:" + title,
-                sources: [{
-                    url: service.baseUrl + url[1]
-                }]
-            });
-        }			
+        }
+
+        page.type = "video";
+        page.source = "videoparams:" + showtime.JSONEncode({
+            title: unescape(title),
+            imdbid: getIMDBid(title),
+            canonicalUrl: plugin.getDescriptor().id + ":playOnline:" + title,
+            sources: [{
+                url: service.baseUrl + link
+            }]
+        });
     });
-	
+
 	// Play URL
     plugin.addURI(plugin.getDescriptor().id + ":play:(.*):(.*)", function(page, title, pos) {
         page.type = "video";
@@ -1039,19 +1061,19 @@
         }
         processScroller(page, url);
     });
-	
+
 
 	/////////////////////////////////////////////////// Lists favorite menu///////////////////////////////////////////////////
-	
+
 	plugin.addURI(plugin.getDescriptor().id + ":myfavourites", function(page) {
         setPageHeader(page, "В избранном на FS.to");
 		response = showtime.httpReq(service.baseUrl + "/myfavourites.aspx").toString().replace(/<div class="b-header__menu-section m-header__menu-section_type_fsua">/g, '');
-		
+
         // Building favorite menu
 		var menu = response.match(/<div class="b-tabs-decorated">[\S\s]*?<ul>[\S\s]*?(<li[\S\s]*<\/li>)[\S\s]*?<\/ul>[\S\s]*?<\/div>/)[1]; //находим блок меню
-		
+
 		//1-url, 2-title
-		var re = /<li[\S\s]*?<a href="([\S\s]*?)">([\S\s]*?)<\/a><\/li>/g; 
+		var re = /<li[\S\s]*?<a href="([\S\s]*?)">([\S\s]*?)<\/a><\/li>/g;
 		var match = re.exec(menu);
 		while (match) {
             page.appendItem(plugin.getDescriptor().id + ":myfavourites_menu:" + match[1]+ ':' + escape(trim(match[2].replace(/&nbsp;/, " "))), 'directory', {
@@ -1059,15 +1081,15 @@
             });
             match = re.exec(menu);
         }
-        page.loading = false;		
+        page.loading = false;
     });
-	
+
 	plugin.addURI(plugin.getDescriptor().id + ":myfavourites_menu:(.*):(.*)", function(page, url, title) {
 	    setPageHeader(page, unescape(title));
 		response = showtime.httpReq(service.baseUrl + url).toString().replace(/<div class="b-header__menu-section m-header__menu-section_type_fsua">/g, '');
-		
+
 		//0-subsection, 1-title, 2-section, 3-subsection
-		var re = /<span class="section-title"><b>([\S\s]*?)<\/b>[\S\s]*?<div class="b-section-footer">[\S\s]*?<a href="#" class="b-add" rel="\{section: '([\S\s]*?)', subsection: '([\S\s]*?)'\}[\S\s]*?<\/div>[\S\s]*?<\/div>/g;		
+		var re = /<span class="section-title"><b>([\S\s]*?)<\/b>[\S\s]*?<div class="b-section-footer">[\S\s]*?<a href="#" class="b-add" rel="\{section: '([\S\s]*?)', subsection: '([\S\s]*?)'\}[\S\s]*?<\/div>[\S\s]*?<\/div>/g;
 		var match = re.exec(response);
 		while (match) {
 		    page.appendItem(plugin.getDescriptor().id + ":myfavourites_content:" + url + ':' + escape(trim(match[1])) + ':' + match[2] + ':' +  match[3], 'directory', {
@@ -1077,12 +1099,12 @@
 		}
 		page.loading = false;
 	});
-	
+
 	plugin.addURI(plugin.getDescriptor().id + ":myfavourites_content:(.*):(.*):(.*):(.*)", function(page, url, title, section, subsection) {
 	    setPageHeader(page, unescape(title));
-		
+
 		//1-url, 2- poster 3-title
-	    var re = /<a href="([\S\s]*?)" class="b-poster-thin[\S\s]*?style="background-image: url\('([\S\s]*?)'\)"[\S\s]*?<b class=[\S\s]*?<span>([\S\s]*?)<\/p><\/span><\/b>[\S\s]*?<\/a>/g ;
+	    var re = /<a href="\/\/fs\.to([\S\s]*?)" class="b-poster-thin[\S\s]*?style="background-image: url\('([\S\s]*?)'\)"[\S\s]*?<b class=[\S\s]*?<span>([\S\s]*?)<\/p><\/span><\/b>[\S\s]*?<\/a>/g ;
 		var curpage, dig_curpage = 0;
 		do{
 			if (!dig_curpage) {
@@ -1094,21 +1116,21 @@
 			response = showtime.httpReq(service.baseUrl + ajax).toString();
 			var obj_response = showtime.JSONDecode(response);
 			match = re.exec(obj_response.content);
-			while (match) {		 
+			while (match) {
                 title = match[3].replace('<p>', " / ").replace('</p><p>', " ").replace('</p>', "");
                 page.appendItem(plugin.getDescriptor().id +":listRoot:" + match[1]+ ':' + escape(trim(match[3])), 'video', {
                     title: new showtime.RichText(title),
                     icon: setIconSize(match[2], 2)
                 });
 			 match = re.exec(obj_response.content);
-            }			
+            }
 			dig_curpage++ ;
-        } while (!obj_response.islast);			
-		  
+        } while (!obj_response.islast);
+
 		 page.loading = false;
-		 
+
 	});
-	
+
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     function setIconSize(s, size) {
@@ -1146,15 +1168,15 @@
                 match = re.exec(response);
             }
         }
-		
-		//////////////////////////////////////////////If login, add my favorites/////////////////////////////////// 
-		
+
+		//////////////////////////////////////////////If login, add my favorites///////////////////////////////////
+
 		if (response.match(/b-header__user-icon b-header__user-favourites/)){
 		    page.appendItem(plugin.getDescriptor().id + ":myfavourites", 'directory', {
                     title: "В избранном на FS.to"
                 });
-		}	
-		
+		}
+
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         // Scraping commentable
@@ -1207,10 +1229,10 @@
     plugin.addSearcher(plugin.getDescriptor().id, logo, function(page, query) {
 	page.entries = 0;
 	var fromPage = 0, tryToSearch = true;
-	
+
 	// 1-link, 2-icon, 3-title, 4-subsection, 5-genres, 6-likes, 7-dislikes, 8-description
 	var re = /<a href="([\S\s]*?)"[\S\s]*?<img src="([\S\s]*?)"[\S\s]*?results-item-title">([\S\s]*?)<\/span>[\S\s]*?results-item-subsection">([\S\s]*?)<\/span>([\S\s]*?)item-rating[\S\s]*?results-item-rating-positive">([\S\s]*?)<\/span>[\S\s]*?results-item-rating-negative">([\S\s]*?)<\/span>[\S\s]*?results-item-description">([\S\s]*?)<\/span>/g;
-	
+
 	function loader() {
             if (!tryToSearch) return false;
             page.loading = true;
