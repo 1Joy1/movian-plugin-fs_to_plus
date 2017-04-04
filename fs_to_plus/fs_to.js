@@ -1104,7 +1104,7 @@
 	    setPageHeader(page, unescape(title));
 
 		//1-url, 2- poster 3-title
-	    var re = /<a href="\/\/fs\.to([\S\s]*?)" class="b-poster-thin[\S\s]*?style="background-image: url\('([\S\s]*?)'\)"[\S\s]*?<b class=[\S\s]*?<span>([\S\s]*?)<\/p><\/span><\/b>[\S\s]*?<\/a>/g ;
+	    var re = /<a href="\/\/fs\.life([\S\s]*?)" class="b-poster-thin[\S\s]*?style="background-image: url\('([\S\s]*?)'\)"[\S\s]*?<b class=[\S\s]*?<span>([\S\s]*?)<\/p><\/span><\/b>[\S\s]*?<\/a>/g ;
 		var curpage, dig_curpage = 0;
 		do{
 			if (!dig_curpage) {
