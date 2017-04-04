@@ -27,13 +27,13 @@
 
     var settings = plugin.createSettings(plugin.getDescriptor().id, logo, plugin.getDescriptor().synopsis);
     settings.createDivider('Settings');
-    settings.createString('baseUrl', "Base URL without '/' at the end", 'http://fs.to', function(v) {
+    settings.createString('baseUrl', "Base URL without '/' at the end", 'http://fs.life', function(v) {
         service.baseUrl = v;
     });
 
 	////////////////////////////////////////////Login of site & Exit of site///////////////////////////////////////
 
-	settings.createDivider('Авторизация на FS.TO');
+	settings.createDivider('Авторизация на FS.LIFE');
 	var store = plugin.createStore('authinfo', true);
 
 	// Залогинится
@@ -52,7 +52,7 @@
                           "Accept-Encoding": "gzip, deflate",
                           "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
                           "X-Requested-With": "XMLHttpRequest",
-                          "Referer": "http://fs.to/",
+                          "Referer": "http://fs.life/",
                           "Connection": "keep-alive",
                           "Pragma": "no-cache",
                           "Cache-Control": "no-cache",},
@@ -89,7 +89,7 @@
                           "Accept-Encoding": "gzip, deflate",
                           "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
                           "X-Requested-With": "XMLHttpRequest",
-                          "Referer": "http://fs.to/",
+                          "Referer": "http://fs.life/",
                           "Connection": "keep-alive",
                           "Pragma": "no-cache",
                           "Cache-Control": "no-cache",},
@@ -98,7 +98,7 @@
 	    	    debug: true,
 	    		noFollow: true
             });
-            showtime.notify('Movian разлогинен на FS.TO', 3, '');
+            showtime.notify('Movian разлогинен на FS.LIFE', 3, '');
 		}
     });
 
@@ -1066,7 +1066,7 @@
 	/////////////////////////////////////////////////// Lists favorite menu///////////////////////////////////////////////////
 
 	plugin.addURI(plugin.getDescriptor().id + ":myfavourites", function(page) {
-        setPageHeader(page, "В избранном на FS.to");
+        setPageHeader(page, "В избранном на FS.life");
 		response = showtime.httpReq(service.baseUrl + "/myfavourites.aspx").toString().replace(/<div class="b-header__menu-section m-header__menu-section_type_fsua">/g, '');
 
         // Building favorite menu
@@ -1173,7 +1173,7 @@
 
 		if (response.match(/b-header__user-icon b-header__user-favourites/)){
 		    page.appendItem(plugin.getDescriptor().id + ":myfavourites", 'directory', {
-                    title: "В избранном на FS.to"
+                    title: "В избранном на FS.Life"
                 });
 		}
 

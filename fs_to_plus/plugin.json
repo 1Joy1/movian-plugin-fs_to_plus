@@ -4,7 +4,7 @@
 	"homepage": "https://github.com/1Joy1/movian-plugin-fs_to_plus/",
 	"title": "FS.UA plus",
 	"synopsis": "FS.UA: Рекомендательная медиа сеть",
-	"version": "0.0.8",
+	"version": "0.0.9",
 	"file": "fs_to.js",
 	"showtimeVersion": "4.8",
 	"type": "ecmascript",
