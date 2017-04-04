@@ -1104,7 +1104,7 @@
 	    setPageHeader(page, unescape(title));
 
 		//1-url, 2- poster 3-title
-	    var re = /<a href="\/\/fs\.life([\S\s]*?)" class="b-poster-thin[\S\s]*?style="background-image: url\('([\S\s]*?)'\)"[\S\s]*?<b class=[\S\s]*?<span>([\S\s]*?)<\/p><\/span><\/b>[\S\s]*?<\/a>/g ;
+	    var re = /<a href="(\/\/fs\.life)?([\S\s]*?)" class="b-poster-thin[\S\s]*?style="background-image: url\('([\S\s]*?)'\)"[\S\s]*?<b class=[\S\s]*?<span>([\S\s]*?)<\/p><\/span><\/b>[\S\s]*?<\/a>/g ;
 		var curpage, dig_curpage = 0;
 		do{
 			if (!dig_curpage) {
@@ -1117,10 +1117,10 @@
 			var obj_response = showtime.JSONDecode(response);
 			match = re.exec(obj_response.content);
 			while (match) {
-                title = match[3].replace('<p>', " / ").replace('</p><p>', " ").replace('</p>', "");
-                page.appendItem(plugin.getDescriptor().id +":listRoot:" + match[1]+ ':' + escape(trim(match[3])), 'video', {
+                title = match[4].replace('<p>', " / ").replace('</p><p>', " ").replace('</p>', "");
+                page.appendItem(plugin.getDescriptor().id +":listRoot:" + match[2]+ ':' + escape(trim(match[4])), 'video', {
                     title: new showtime.RichText(title),
-                    icon: setIconSize(match[2], 2)
+                    icon: setIconSize(match[3], 2)
                 });
 			 match = re.exec(obj_response.content);
             }
